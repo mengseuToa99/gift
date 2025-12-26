@@ -10,6 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Noto+Serif+Khmer:wght@400;700&display=swap" rel="stylesheet">
     <style>
       body, html { margin: 0; padding: 0; background-color: #050505; overflow: hidden; }
+      #root { opacity: 0; animation: fadeInRoot 0.8s ease-in 0.1s forwards; }
+      @keyframes fadeInRoot {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
       /* Custom font classes to ensure Tailwind picks them up */
       .font-serif-luxury { font-family: 'Cormorant Garamond', serif; }
       .font-khmer { font-family: 'Noto Serif Khmer', serif; }

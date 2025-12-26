@@ -7,10 +7,22 @@ const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>(AppPhase.OFFERING);
 
   return (
-    <div className="relative w-full h-screen bg-black">
+    <div className="relative w-full h-screen bg-black overflow-hidden">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .fade-in {
+          animation: fadeIn 0.8s ease-in forwards;
+        }
+      `}</style>
+      
       {/* 3D Canvas Layer */}
       <Suspense fallback={<div className="text-white absolute center">Loading Light...</div>}>
-        <Scene phase={phase} setPhase={setPhase} />
+        <div className="fade-in w-full h-full">
+          <Scene phase={phase} setPhase={setPhase} />
+        </div>
       </Suspense>
 
       {/* HTML/Text Layer */}

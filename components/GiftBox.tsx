@@ -32,7 +32,7 @@ export const GiftBox: React.FC<GiftBoxProps> = ({ onOpen }) => {
     groupRef.current.scale.lerp(new Vector3(targetScale, targetScale, targetScale), delta * 5);
   });
 
-  const boxColor = "#E60000"; // Vibrant Bright Red
+  const boxColor = "#FF0000"; // Bright Red
   const ribbonColor = "#FFFFFF"; // Pure White
 
   // Reusable material props for the ribbons (Satin finish)
