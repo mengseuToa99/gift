@@ -100,12 +100,25 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
           toneMapping: THREE.ReinhardToneMapping, 
           toneMappingExposure: 1.5,
           alpha: true,
-          premultipliedAlpha: false
+          premultipliedAlpha: false,
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: true,
         }}
         dpr={[1, 2]}
         onCreated={(state) => {
           console.log('[CANVAS-INIT] Canvas created at', new Date().toISOString());
           console.log('[CANVAS-SPEC] Size:', state.gl.domElement.width, 'x', state.gl.domElement.height, '| DPR:', state.gl.getPixelRatio());
+          
+          // Handle WebGL context loss
+          const canvas = state.gl.domElement;
+          canvas.addEventListener('webglcontextlost', (event) => {
+            console.warn('[CANVAS-ERROR] WebGL context lost');
+            event.preventDefault();
+          });
+          
+          canvas.addEventListener('webglcontextrestored', () => {
+            console.log('[CANVAS-RECOVERY] WebGL context restored');
+          });
           
           const startTime = performance.now();
           
