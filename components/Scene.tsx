@@ -47,6 +47,7 @@ const CameraController = ({ phase }: { phase: AppPhase }) => {
 export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [sceneContentReady, setSceneContentReady] = useState(false);
+  const hasShownOverlay = React.useRef(false); // Track if we've already shown the overlay
   
   React.useEffect(() => {
     console.log('[SCENE] Component mounted, isCanvasReady:', isCanvasReady);
@@ -62,43 +63,49 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   React.useEffect(() => {
     console.log('[SCENE] sceneContentReady changed to:', sceneContentReady);
   }, [sceneContentReady]);
+
+  React.useEffect(() => {
+    console.log('[SCENE] Phase changed to:', phase);
+  }, [phase]);
   
   const handleGiftOpen = () => {
-    console.log('[SCENE] Gift opened');
+    console.log('[SCENE] Gift opened, transitioning to TREE phase');
     if (phase === AppPhase.OFFERING) {
       setPhase(AppPhase.TREE);
     }
   };
 
   const handleTreeClick = () => {
-    console.log('[SCENE] Tree clicked');
+    console.log('[SCENE] Tree clicked, transitioning to EXPLOSION phase');
     if (phase === AppPhase.TREE) {
       setPhase(AppPhase.EXPLOSION);
     }
   };
 
   const handleExplosionComplete = () => {
-    console.log('[SCENE] Explosion complete');
+    console.log('[SCENE] Explosion complete, transitioning to MESSAGE phase');
     setPhase(AppPhase.MESSAGE);
   };
 
   return (
     <>
-      {/* Loading overlay - stays visible until scene is fully ready */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#050505',
-          opacity: sceneContentReady ? 0 : 1,
-          transition: 'opacity 0.8s ease-in',
-          pointerEvents: sceneContentReady ? 'none' : 'auto',
-          zIndex: 9999,
-        }}
-      />
+      {/* Loading overlay - only appears on initial mount, never reappears */}
+      {!sceneContentReady && hasShownOverlay.current === false && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#050505',
+            opacity: sceneContentReady ? 0 : 1,
+            transition: 'opacity 0.8s ease-in',
+            pointerEvents: sceneContentReady ? 'none' : 'auto',
+            zIndex: 9999,
+          }}
+        />
+      )}
       
       <Canvas 
         gl={{ 
@@ -124,9 +131,9 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
           setTimeout(() => {
             console.log('[SCENE] Scene content is fully rendered, hiding overlay');
             setSceneContentReady(true);
-          }, 300);
+            hasShownOverlay.current = true; // Mark overlay as shown
+          }, 400);
         }}
-        style={{ opacity: isCanvasReady ? 1 : 0, transition: 'opacity 0.6s ease-in' }}
       >
       <PerspectiveCamera makeDefault position={CONFIG.cameraPosition} fov={50} />
       <CameraController phase={phase} />
