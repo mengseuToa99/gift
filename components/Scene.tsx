@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Stars, Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
@@ -46,39 +46,88 @@ const CameraController = ({ phase }: { phase: AppPhase }) => {
 
 export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   const [isCanvasReady, setIsCanvasReady] = useState(false);
+  const [sceneContentReady, setSceneContentReady] = useState(false);
+  
+  React.useEffect(() => {
+    console.log('[SCENE] Component mounted, isCanvasReady:', isCanvasReady);
+  }, []);
+
+  React.useEffect(() => {
+    console.log('[SCENE] isCanvasReady changed to:', isCanvasReady);
+    if (isCanvasReady) {
+      console.log('[SCENE] Canvas is now ready and should be visible!');
+    }
+  }, [isCanvasReady]);
+
+  React.useEffect(() => {
+    console.log('[SCENE] sceneContentReady changed to:', sceneContentReady);
+  }, [sceneContentReady]);
   
   const handleGiftOpen = () => {
+    console.log('[SCENE] Gift opened');
     if (phase === AppPhase.OFFERING) {
       setPhase(AppPhase.TREE);
     }
   };
 
   const handleTreeClick = () => {
+    console.log('[SCENE] Tree clicked');
     if (phase === AppPhase.TREE) {
       setPhase(AppPhase.EXPLOSION);
     }
   };
 
   const handleExplosionComplete = () => {
+    console.log('[SCENE] Explosion complete');
     setPhase(AppPhase.MESSAGE);
   };
 
   return (
-    <Canvas 
-      gl={{ 
-        antialias: false, 
-        toneMapping: THREE.ReinhardToneMapping, 
-        toneMappingExposure: 1.5,
-        alpha: true,
-        premultipliedAlpha: false
-      }}
-      dpr={[1, 2]}
-      onCreated={() => {
-        // Mark canvas as ready after a brief delay to ensure first frame is rendered
-        setTimeout(() => setIsCanvasReady(true), 50);
-      }}
-      style={{ opacity: isCanvasReady ? 1 : 0, transition: 'opacity 0.6s ease-in' }}
-    >
+    <>
+      {/* Loading overlay - stays visible until scene is fully ready */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#050505',
+          opacity: sceneContentReady ? 0 : 1,
+          transition: 'opacity 0.8s ease-in',
+          pointerEvents: sceneContentReady ? 'none' : 'auto',
+          zIndex: 9999,
+        }}
+      />
+      
+      <Canvas 
+        gl={{ 
+          antialias: false, 
+          toneMapping: THREE.ReinhardToneMapping, 
+          toneMappingExposure: 1.5,
+          alpha: true,
+          premultipliedAlpha: false
+        }}
+        dpr={[1, 2]}
+        onCreated={(state) => {
+          console.log('[CANVAS] Canvas created, renderer:', state.gl.constructor.name);
+          console.log('[CANVAS] DPR:', state.gl.getPixelRatio());
+          console.log('[CANVAS] Canvas size:', state.gl.domElement.width, 'x', state.gl.domElement.height);
+          
+          // Mark canvas as ready after a brief delay to ensure first frame is rendered
+          setTimeout(() => {
+            console.log('[CANVAS] Setting canvas ready after 50ms delay');
+            setIsCanvasReady(true);
+          }, 50);
+          
+          // Mark scene content as ready after longer delay to ensure Stars/Sparkles render
+          setTimeout(() => {
+            console.log('[SCENE] Scene content is fully rendered, hiding overlay');
+            setSceneContentReady(true);
+          }, 300);
+        }}
+        style={{ opacity: isCanvasReady ? 1 : 0, transition: 'opacity 0.6s ease-in' }}
+      >
       <PerspectiveCamera makeDefault position={CONFIG.cameraPosition} fov={50} />
       <CameraController phase={phase} />
       
@@ -110,5 +159,6 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
 
       <Effects />
     </Canvas>
+    </>
   );
 };
