@@ -14,7 +14,7 @@ const App: React.FC = () => {
           to { opacity: 1; }
         }
         .fade-in {
-          animation: fadeIn 1.2s ease-in 0.15s forwards;
+          animation: fadeIn 1.5s ease-in 0.25s forwards;
           will-change: opacity;
         }
       `}</style>

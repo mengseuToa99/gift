@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Stars, Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,6 +45,7 @@ const CameraController = ({ phase }: { phase: AppPhase }) => {
 }
 
 export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
   
   const handleGiftOpen = () => {
     if (phase === AppPhase.OFFERING) {
@@ -64,8 +65,19 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
 
   return (
     <Canvas 
-      gl={{ antialias: false, toneMapping: THREE.ReinhardToneMapping, toneMappingExposure: 1.5 }}
+      gl={{ 
+        antialias: false, 
+        toneMapping: THREE.ReinhardToneMapping, 
+        toneMappingExposure: 1.5,
+        alpha: true,
+        premultipliedAlpha: false
+      }}
       dpr={[1, 2]}
+      onCreated={() => {
+        // Mark canvas as ready after a brief delay to ensure first frame is rendered
+        setTimeout(() => setIsCanvasReady(true), 50);
+      }}
+      style={{ opacity: isCanvasReady ? 1 : 0, transition: 'opacity 0.6s ease-in' }}
     >
       <PerspectiveCamera makeDefault position={CONFIG.cameraPosition} fov={50} />
       <CameraController phase={phase} />
