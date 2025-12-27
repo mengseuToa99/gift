@@ -48,41 +48,19 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [sceneContentReady, setSceneContentReady] = useState(false);
   
-  React.useEffect(() => {
-    console.log('[SCENE] Component mounted, isCanvasReady:', isCanvasReady);
-  }, []);
-
-  React.useEffect(() => {
-    console.log('[SCENE] isCanvasReady changed to:', isCanvasReady);
-    if (isCanvasReady) {
-      console.log('[SCENE] Canvas is now ready and should be visible!');
-    }
-  }, [isCanvasReady]);
-
-  React.useEffect(() => {
-    console.log('[SCENE] sceneContentReady changed to:', sceneContentReady);
-  }, [sceneContentReady]);
-
-  React.useEffect(() => {
-    console.log('[SCENE] Phase changed to:', phase);
-  }, [phase]);
-  
   const handleGiftOpen = () => {
-    console.log('[SCENE] Gift opened, transitioning to TREE phase');
     if (phase === AppPhase.OFFERING) {
       setPhase(AppPhase.TREE);
     }
   };
 
   const handleTreeClick = () => {
-    console.log('[SCENE] Tree clicked, transitioning to EXPLOSION phase');
     if (phase === AppPhase.TREE) {
       setPhase(AppPhase.EXPLOSION);
     }
   };
 
   const handleExplosionComplete = () => {
-    console.log('[SCENE] Explosion complete, transitioning to MESSAGE phase');
     setPhase(AppPhase.MESSAGE);
   };
 
@@ -98,7 +76,7 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
           height: '100%',
           backgroundColor: '#050505',
           opacity: sceneContentReady ? 0 : 1,
-          transition: 'opacity 1s ease-in',
+          transition: 'opacity 1.2s ease-in',
           pointerEvents: sceneContentReady ? 'none' : 'auto',
           zIndex: 9999,
           willChange: 'opacity',
@@ -115,21 +93,16 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
         }}
         dpr={[1, 2]}
         onCreated={(state) => {
-          console.log('[CANVAS] Canvas created, renderer:', state.gl.constructor.name);
-          console.log('[CANVAS] DPR:', state.gl.getPixelRatio());
-          console.log('[CANVAS] Canvas size:', state.gl.domElement.width, 'x', state.gl.domElement.height);
-          
           // Mark canvas as ready after a brief delay to ensure first frame is rendered
           setTimeout(() => {
-            console.log('[CANVAS] Setting canvas ready after 50ms delay');
             setIsCanvasReady(true);
           }, 50);
           
-          // Mark scene content as ready after longer delay to ensure Stars/Sparkles render
+          // Mark scene content as ready after longer delay to ensure ALL Stars/Sparkles/lights render
+          // Increased to 1200ms to handle large desktop screens
           setTimeout(() => {
-            console.log('[SCENE] Scene content is fully rendered, hiding overlay');
             setSceneContentReady(true);
-          }, 500);
+          }, 1200);
         }}
       >
       <PerspectiveCamera makeDefault position={CONFIG.cameraPosition} fov={50} />
