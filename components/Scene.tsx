@@ -47,7 +47,6 @@ const CameraController = ({ phase }: { phase: AppPhase }) => {
 export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [sceneContentReady, setSceneContentReady] = useState(false);
-  const hasShownOverlay = React.useRef(false); // Track if we've already shown the overlay
   
   React.useEffect(() => {
     console.log('[SCENE] Component mounted, isCanvasReady:', isCanvasReady);
@@ -89,23 +88,22 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
 
   return (
     <>
-      {/* Loading overlay - only appears on initial mount, never reappears */}
-      {!sceneContentReady && hasShownOverlay.current === false && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#050505',
-            opacity: sceneContentReady ? 0 : 1,
-            transition: 'opacity 0.8s ease-in',
-            pointerEvents: sceneContentReady ? 'none' : 'auto',
-            zIndex: 9999,
-          }}
-        />
-      )}
+      {/* Loading overlay - stays in DOM but hidden after initial load to avoid flashing */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#050505',
+          opacity: sceneContentReady ? 0 : 1,
+          transition: 'opacity 1s ease-in',
+          pointerEvents: sceneContentReady ? 'none' : 'auto',
+          zIndex: 9999,
+          willChange: 'opacity',
+        }}
+      />
       
       <Canvas 
         gl={{ 
@@ -131,8 +129,7 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
           setTimeout(() => {
             console.log('[SCENE] Scene content is fully rendered, hiding overlay');
             setSceneContentReady(true);
-            hasShownOverlay.current = true; // Mark overlay as shown
-          }, 400);
+          }, 500);
         }}
       >
       <PerspectiveCamera makeDefault position={CONFIG.cameraPosition} fov={50} />

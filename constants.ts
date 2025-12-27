@@ -16,6 +16,6 @@ export const CONFIG = {
 
 export const TEXT = {
   khmer: "Dear", // Pisces Zodiac
-  main: "O Chhan",
+  main: "B Chhan",
   sub: "May all your dreams come true, you truly deserve them.",
 };
