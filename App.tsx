@@ -6,6 +6,15 @@ import { AppPhase } from './types';
 const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>(AppPhase.OFFERING);
 
+  React.useEffect(() => {
+    console.log('[APP-MOUNT] App mounted');
+    return () => console.log('[APP-UNMOUNT] App unmounting');
+  }, []);
+
+  React.useEffect(() => {
+    console.log('[APP-RENDER] App rendered, phase:', phase);
+  });
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       <style>{`

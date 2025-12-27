@@ -48,19 +48,30 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [sceneContentReady, setSceneContentReady] = useState(false);
   
+  React.useEffect(() => {
+    console.log('[RENDER] Scene component rendered, phase:', phase);
+  });
+
+  React.useEffect(() => {
+    console.log('[STATE] sceneContentReady:', sceneContentReady, ' | overlay opacity:', sceneContentReady ? 0 : 1);
+  }, [sceneContentReady]);
+  
   const handleGiftOpen = () => {
+    console.log('[ACTION] Gift opened');
     if (phase === AppPhase.OFFERING) {
       setPhase(AppPhase.TREE);
     }
   };
 
   const handleTreeClick = () => {
+    console.log('[ACTION] Tree clicked');
     if (phase === AppPhase.TREE) {
       setPhase(AppPhase.EXPLOSION);
     }
   };
 
   const handleExplosionComplete = () => {
+    console.log('[ACTION] Explosion complete');
     setPhase(AppPhase.MESSAGE);
   };
 
@@ -93,14 +104,22 @@ export const Scene: React.FC<SceneProps> = ({ phase, setPhase }) => {
         }}
         dpr={[1, 2]}
         onCreated={(state) => {
+          console.log('[CANVAS-INIT] Canvas created at', new Date().toISOString());
+          console.log('[CANVAS-SPEC] Size:', state.gl.domElement.width, 'x', state.gl.domElement.height, '| DPR:', state.gl.getPixelRatio());
+          
+          const startTime = performance.now();
+          
           // Mark canvas as ready after a brief delay to ensure first frame is rendered
           setTimeout(() => {
+            const elapsed = performance.now() - startTime;
+            console.log('[CANVAS-READY] Canvas ready after', elapsed.toFixed(0), 'ms');
             setIsCanvasReady(true);
           }, 50);
           
           // Mark scene content as ready after longer delay to ensure ALL Stars/Sparkles/lights render
-          // Increased to 1200ms to handle large desktop screens
           setTimeout(() => {
+            const elapsed = performance.now() - startTime;
+            console.log('[SCENE-READY] Scene content ready after', elapsed.toFixed(0), 'ms - HIDING OVERLAY NOW');
             setSceneContentReady(true);
           }, 1200);
         }}
